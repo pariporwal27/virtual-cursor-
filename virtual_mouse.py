@@ -50,3 +50,31 @@ def is_finger_up(hand_landmarks, finger_index):
     mcp_y = hand_landmarks.landmark[finger_index - 3].y
     tip_y = hand_landmarks.landmark[finger_index].y
     return tip_y < mcp_y
+
+def main():
+    global curr_x, curr_y, prev_x, prev_y, left_clicked, right_clicked, exit_counter
+    
+    cap = cv2.VideoCapture(0)
+    
+    window_name = "Virtual Mouse - Robust Exit"
+    cv2.namedWindow(window_name)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
+    
+    while cap.isOpened():
+        success, img = cap.read()
+        if not success: break
+            
+        img = cv2.flip(img, 1)
+        h, w, _ = img.shape
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        results = hands.process(img_rgb)
+        
+        cv2.imshow(window_name, img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+            
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
