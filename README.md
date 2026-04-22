@@ -44,3 +44,11 @@ Before running the project, ensure you have the following installed:
 4. **Right Click**: Pinch your middle finger and thumb together.
 5. **Scroll**: Raise both index and middle fingers and move them vertically.
 6. **Exit**: Cross your index fingers and hold for 1 second, or press `q`.
+
+## 📜 Future Enhancements
+- Support for multi-monitor setups.
+- Customizable gesture mappings.
+- Low-light mode optimization.
+
+---
+Developed as a college project to explore Human-Computer Interaction through Computer Vision.
