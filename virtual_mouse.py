@@ -20,3 +20,21 @@ mp_draw = mp.solutions.drawing_utils
 
 # Screen dimensions
 screen_width, screen_height = pyautogui.size()
+
+# CONFIGURATION
+SMOOTH_FACTOR = 5 
+curr_x, curr_y = 0, 0
+prev_x, prev_y = 0, 0
+FRAME_MARGIN = 80 
+
+# Scroll parameters
+SCROLL_SENSITIVITY = 18 
+SCROLL_THRESHOLD = 5 
+
+# CLICK THRESHOLDS
+PINCH_THRESHOLD = 0.035 
+SEPARATION_THRESHOLD = 0.06 
+
+# EXIT GESTURE CONFIG
+exit_counter = 0
+EXIT_FRAMES_REQUIRED = 20 # Require ~1 second of holding the cross
