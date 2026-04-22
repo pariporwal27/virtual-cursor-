@@ -21,3 +21,15 @@ Before running the project, ensure you have the following installed:
 - Python 3.8 or higher
 - A standard Webcam
 - Active internet connection (for initial MediaPipe model downloads)
+
+## 🔧 Installation & Setup
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/pariporwal27/virtual-cursor-.git
+   cd virtual-cursor-
+   ```
+
+2. **Install required dependencies:**
+   ```bash
+   pip install opencv-python mediapipe pyautogui numpy
+   ```
