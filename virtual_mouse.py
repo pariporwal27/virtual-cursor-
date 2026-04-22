@@ -69,50 +69,78 @@ def main():
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         results = hands.process(img_rgb)
         
+        cross_detected_this_frame = False
+        
         if results.multi_hand_landmarks:
+            num_hands = len(results.multi_hand_landmarks)
+            
             for hand_lms in results.multi_hand_landmarks:
                 mp_draw.draw_landmarks(img, hand_lms, mp_hands.HAND_CONNECTIONS)
+
+            # --- EXIT CROSS LOGIC ---
+            if num_hands == 2:
+                hand1_lms = results.multi_hand_landmarks[0]
+                hand2_lms = results.multi_hand_landmarks[1]
+                if is_finger_up(hand1_lms, 8) and is_finger_up(hand2_lms, 8):
+                    tip1 = hand1_lms.landmark[8]
+                    tip2 = hand2_lms.landmark[8]
+                    if get_distance(tip1, tip2) < 0.04:
+                        cross_detected_this_frame = True
             
             # --- MAIN CONTROL LOGIC ---
-            hand_landmarks = results.multi_hand_landmarks[0]
-            thumb_tip = hand_landmarks.landmark[4]
-            index_tip = hand_landmarks.landmark[8]
-            middle_tip = hand_landmarks.landmark[12]
-            
-            index_up = is_finger_up(hand_landmarks, 8)
-            
-            # Mapping coordinates to screen size
-            target_x = np.interp(index_tip.x * w, (FRAME_MARGIN, w - FRAME_MARGIN), (0, screen_width))
-            target_y = np.interp(index_tip.y * h, (FRAME_MARGIN, h - FRAME_MARGIN), (0, screen_height))
-            
-            # Smoothing
-            curr_x = prev_x + (target_x - prev_x) / SMOOTH_FACTOR
-            curr_y = prev_y + (target_y - prev_y) / SMOOTH_FACTOR
-            
-            if index_up:
-                pyautogui.moveTo(curr_x, curr_y)
-                cv2.putText(img, "MOVING", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-            
-            # Clicks
-            d_index = get_distance(index_tip, thumb_tip)
-            d_middle = get_distance(middle_tip, thumb_tip)
-            
-            if d_index < PINCH_THRESHOLD and d_middle > SEPARATION_THRESHOLD:
-                if not left_clicked:
-                    pyautogui.click()
-                    left_clicked = True
-                cv2.circle(img, (int(index_tip.x * w), int(index_tip.y * h)), 25, (0, 255, 0), cv2.FILLED)
-            else: left_clicked = False
+            if num_hands == 1 or (num_hands == 2 and not cross_detected_this_frame):
+                hand_landmarks = results.multi_hand_landmarks[0]
+                thumb_tip = hand_landmarks.landmark[4]
+                index_tip = hand_landmarks.landmark[8]
+                middle_tip = hand_landmarks.landmark[12]
                 
-            if d_middle < PINCH_THRESHOLD and d_index > SEPARATION_THRESHOLD:
-                if not right_clicked:
-                    pyautogui.rightClick()
-                    right_clicked = True
-                cv2.circle(img, (int(middle_tip.x * w), int(middle_tip.y * h)), 25, (0, 0, 255), cv2.FILLED)
-            else: right_clicked = False
+                index_up = is_finger_up(hand_landmarks, 8)
+                middle_up = is_finger_up(hand_landmarks, 12)
+                
+                target_x = np.interp(index_tip.x * w, (FRAME_MARGIN, w - FRAME_MARGIN), (0, screen_width))
+                target_y = np.interp(index_tip.y * h, (FRAME_MARGIN, h - FRAME_MARGIN), (0, screen_height))
+                curr_x = prev_x + (target_x - prev_x) / SMOOTH_FACTOR
+                curr_y = prev_y + (target_y - prev_y) / SMOOTH_FACTOR
+                
+                if index_up and middle_up:
+                    dy = curr_y - prev_y
+                    if abs(dy) > SCROLL_THRESHOLD:
+                        pyautogui.scroll(-int(dy * SCROLL_SENSITIVITY))
+                    cv2.putText(img, "SCROLLING", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
+                elif index_up:
+                    pyautogui.moveTo(curr_x, curr_y)
+                    cv2.putText(img, "MOVING", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+                
+                d_index = get_distance(index_tip, thumb_tip)
+                d_middle = get_distance(middle_tip, thumb_tip)
+                
+                if d_index < PINCH_THRESHOLD and d_middle > SEPARATION_THRESHOLD:
+                    if not left_clicked:
+                        pyautogui.click()
+                        left_clicked = True
+                    cv2.circle(img, (int(index_tip.x * w), int(index_tip.y * h)), 25, (0, 255, 0), cv2.FILLED)
+                else: left_clicked = False
+                    
+                if d_middle < PINCH_THRESHOLD and d_index > SEPARATION_THRESHOLD:
+                    if not right_clicked:
+                        pyautogui.rightClick()
+                        right_clicked = True
+                    cv2.circle(img, (int(middle_tip.x * w), int(middle_tip.y * h)), 25, (0, 0, 255), cv2.FILLED)
+                else: right_clicked = False
+                
+                prev_x, prev_y = curr_x, curr_y
+
+        if cross_detected_this_frame:
+            exit_counter += 1
+            progress = int((exit_counter / EXIT_FRAMES_REQUIRED) * 100)
+            cv2.putText(img, f"EXITING... {progress}%", (w//2 - 100, h//2), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+        else:
+            exit_counter = max(0, exit_counter - 1)
             
-            prev_x, prev_y = curr_x, curr_y
-        
+        if exit_counter >= EXIT_FRAMES_REQUIRED:
+            break
+            
         cv2.imshow(window_name, img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
