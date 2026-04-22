@@ -33,3 +33,14 @@ Before running the project, ensure you have the following installed:
    ```bash
    pip install opencv-python mediapipe pyautogui numpy
    ```
+
+## 🎮 Usage
+1. Run the script:
+   ```bash
+   python virtual_mouse.py
+   ```
+2. **Move Cursor**: Raise your index finger and move it within the camera frame.
+3. **Left Click**: Pinch your index finger and thumb together.
+4. **Right Click**: Pinch your middle finger and thumb together.
+5. **Scroll**: Raise both index and middle fingers and move them vertically.
+6. **Exit**: Cross your index fingers and hold for 1 second, or press `q`.
