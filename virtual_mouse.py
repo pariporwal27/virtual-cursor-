@@ -72,6 +72,14 @@ def main():
         if results.multi_hand_landmarks:
             for hand_lms in results.multi_hand_landmarks:
                 mp_draw.draw_landmarks(img, hand_lms, mp_hands.HAND_CONNECTIONS)
+            
+            # --- MAIN CONTROL LOGIC ---
+            hand_landmarks = results.multi_hand_landmarks[0]
+            index_tip = hand_landmarks.landmark[8]
+            
+            # Mapping coordinates to screen size
+            target_x = np.interp(index_tip.x * w, (FRAME_MARGIN, w - FRAME_MARGIN), (0, screen_width))
+            target_y = np.interp(index_tip.y * h, (FRAME_MARGIN, h - FRAME_MARGIN), (0, screen_height))
         
         cv2.imshow(window_name, img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
