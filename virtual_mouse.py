@@ -75,7 +75,10 @@ def main():
             
             # --- MAIN CONTROL LOGIC ---
             hand_landmarks = results.multi_hand_landmarks[0]
+            thumb_tip = hand_landmarks.landmark[4]
             index_tip = hand_landmarks.landmark[8]
+            middle_tip = hand_landmarks.landmark[12]
+            
             index_up = is_finger_up(hand_landmarks, 8)
             
             # Mapping coordinates to screen size
@@ -89,6 +92,24 @@ def main():
             if index_up:
                 pyautogui.moveTo(curr_x, curr_y)
                 cv2.putText(img, "MOVING", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+            
+            # Clicks
+            d_index = get_distance(index_tip, thumb_tip)
+            d_middle = get_distance(middle_tip, thumb_tip)
+            
+            if d_index < PINCH_THRESHOLD and d_middle > SEPARATION_THRESHOLD:
+                if not left_clicked:
+                    pyautogui.click()
+                    left_clicked = True
+                cv2.circle(img, (int(index_tip.x * w), int(index_tip.y * h)), 25, (0, 255, 0), cv2.FILLED)
+            else: left_clicked = False
+                
+            if d_middle < PINCH_THRESHOLD and d_index > SEPARATION_THRESHOLD:
+                if not right_clicked:
+                    pyautogui.rightClick()
+                    right_clicked = True
+                cv2.circle(img, (int(middle_tip.x * w), int(middle_tip.y * h)), 25, (0, 0, 255), cv2.FILLED)
+            else: right_clicked = False
             
             prev_x, prev_y = curr_x, curr_y
         
