@@ -8,3 +8,10 @@ VisionCursor is a robust, vision-based Human-Computer Interface (HCI) that allow
 - **Gesture-Based Scrolling**: Scroll through documents and web pages by raising two fingers.
 - **Robust Exit Gesture**: Securely exit the application by crossing your index fingers for 1 second.
 - **Visual Feedback**: Real-time on-screen overlays for gesture recognition status.
+
+## 🛠️ Tech Stack
+- **Python**: Core logic and automation.
+- **OpenCV**: Image processing and camera stream handling.
+- **MediaPipe**: High-fidelity hand landmark detection and tracking.
+- **PyAutoGUI**: Cross-platform mouse and keyboard automation.
+- **NumPy**: Efficient coordinate and distance calculations.
