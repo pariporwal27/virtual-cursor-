@@ -76,10 +76,21 @@ def main():
             # --- MAIN CONTROL LOGIC ---
             hand_landmarks = results.multi_hand_landmarks[0]
             index_tip = hand_landmarks.landmark[8]
+            index_up = is_finger_up(hand_landmarks, 8)
             
             # Mapping coordinates to screen size
             target_x = np.interp(index_tip.x * w, (FRAME_MARGIN, w - FRAME_MARGIN), (0, screen_width))
             target_y = np.interp(index_tip.y * h, (FRAME_MARGIN, h - FRAME_MARGIN), (0, screen_height))
+            
+            # Smoothing
+            curr_x = prev_x + (target_x - prev_x) / SMOOTH_FACTOR
+            curr_y = prev_y + (target_y - prev_y) / SMOOTH_FACTOR
+            
+            if index_up:
+                pyautogui.moveTo(curr_x, curr_y)
+                cv2.putText(img, "MOVING", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+            
+            prev_x, prev_y = curr_x, curr_y
         
         cv2.imshow(window_name, img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
