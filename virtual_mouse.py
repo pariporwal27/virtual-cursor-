@@ -45,3 +45,8 @@ right_clicked = False
 
 def get_distance(p1, p2):
     return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+
+def is_finger_up(hand_landmarks, finger_index):
+    mcp_y = hand_landmarks.landmark[finger_index - 3].y
+    tip_y = hand_landmarks.landmark[finger_index].y
+    return tip_y < mcp_y
