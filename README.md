@@ -15,3 +15,9 @@ VisionCursor is a robust, vision-based Human-Computer Interface (HCI) that allow
 - **MediaPipe**: High-fidelity hand landmark detection and tracking.
 - **PyAutoGUI**: Cross-platform mouse and keyboard automation.
 - **NumPy**: Efficient coordinate and distance calculations.
+
+## 📋 Prerequisites
+Before running the project, ensure you have the following installed:
+- Python 3.8 or higher
+- A standard Webcam
+- Active internet connection (for initial MediaPipe model downloads)
